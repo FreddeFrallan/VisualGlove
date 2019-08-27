@@ -1,30 +1,6 @@
 from Datasets import DatasetManager
+from Visuals import EmbeddingModel
 import numpy as np
-
-
-def createImageEmbeddingModel():
-    import keras
-    model = keras.applications.mobilenet_v2.MobileNetV2()
-    outLayer = model.get_layer('global_average_pooling2d_1')
-    return keras.Model(model.inputs, outLayer.output)
-
-
-def createAverageEmbeddingForImages(model, wordImages):
-    '''Images is a list containing lists of images per word'''
-    numberOfImagesPerWord = [len(imgs) for imgs in wordImages]
-    allImages = []
-    for imgs in wordImages:
-        allImages += imgs
-
-    predictions = model.predict(np.array(allImages))
-    vectorsPerWord = []
-    counter = 0
-    for n in numberOfImagesPerWord:
-        vectorsPerWord.append(predictions[counter:counter + n])
-        counter += n
-
-    return [np.mean(np.array(wordVectors), axis=0) for wordVectors in vectorsPerWord]
-
 
 def _imageWorker(id, vocab, wordsPerBatch, imgSize, sendPipe, listenPipe):
     print("Starting image worker:", id)
@@ -51,7 +27,7 @@ def createAverageEmbeddingsForVocab(vocab, wordsPerBatch, wordsPerFile, imgSize,
     vocabSize = len(vocab)
 
     np.set_printoptions(suppress=True, linewidth=999999, threshold=9999999)
-    embeddingModel = createImageEmbeddingModel()
+    embeddingModel = EmbeddingModel.createImageEmbeddingModel()
 
     # Setup Image Procs
     procs = []
@@ -77,7 +53,7 @@ def createAverageEmbeddingsForVocab(vocab, wordsPerBatch, wordsPerFile, imgSize,
         id, words, imgs = listenPipe.get()
 
         try:
-            for i, embedding in enumerate(createAverageEmbeddingForImages(embeddingModel, imgs)):
+            for i, embedding in enumerate(EmbeddingModel.createAverageEmbeddingForImages(embeddingModel, imgs)):
                 currentFile.write("{} {}\n".format(words[i], np.array2string(embedding)[1:-1]))
 
             embeddingsInCurrentFile += wordsPerBatch
@@ -94,15 +70,3 @@ def createAverageEmbeddingsForVocab(vocab, wordsPerBatch, wordsPerFile, imgSize,
             print(e)
 
         toPipes[id].put("Get Images")
-
-
-if __name__ == '__main__':
-    from NormalGlove import Vocab
-    path = DatasetManager.getVisualEmbeddingsFullSizeFolderPath()
-    vocab = Vocab.readVocabFromCSVFile()
-    createAverageEmbeddingsForVocab(vocab, 3, 10, [224, 224], path, 3)
-
-
-    with open(path + "/Embeddings1", 'r') as f:
-        for l in f.readlines():
-            print(l[:40])
