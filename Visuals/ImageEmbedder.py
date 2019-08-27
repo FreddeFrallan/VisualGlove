@@ -48,7 +48,7 @@ def createAverageEmbeddingsForVocab(vocab, wordsPerBatch, wordsPerFile, imgSize,
     filesCreated = 0
     totalEmbeddingsSaved = 0
     embeddingsInCurrentFile = 0
-    currentFile = open(outFolder + "/Embeddings{}.txt".format(filesCreated), 'w')
+    currentFile = open(DatasetManager._addFileToPath(outFolder,"Embeddings{}.txt".format(filesCreated)), 'w')
     while (totalEmbeddingsSaved < vocabSize):
         id, words, imgs = listenPipe.get()
 
@@ -64,7 +64,7 @@ def createAverageEmbeddingsForVocab(vocab, wordsPerBatch, wordsPerFile, imgSize,
                 currentFile.close()
                 embeddingsInCurrentFile = 0
                 filesCreated += 1
-                currentFile = open(outFolder + "/Embeddings{}.txt".format(filesCreated), 'w')
+                currentFile = open(DatasetManager._addFileToPath(outFolder,"Embeddings{}.txt".format(filesCreated)), 'w')
 
         except Exception as e:
             print(e)
