@@ -1,8 +1,15 @@
-from Visuals.ImageEmbedder import createAverageEmbeddingsForVocab
+from Visuals import ImageEmbedder, Leftovers
 from Datasets import DatasetManager
+import sys
 
-if __name__ == '__main__':
+def findLeftovers():
     from NormalGlove import Vocab
     path = DatasetManager.getVisualEmbeddingsFullSizeFolderPath()
     vocab = Vocab.readVocabFromCSVFile()
-    createAverageEmbeddingsForVocab(vocab, 3, 10, [224, 224], path, 3)
+    lostEmbeddings = Leftovers.findWordsThatLackEmbedings(vocab, path)
+    print("Leftovers found", len(lostEmbeddings))
+
+if __name__ == '__main__':
+    #createAverageEmbeddingsForVocab(vocab, 3, 10, [224, 224], path, 3)
+    if(sys.argv[0].low() == "leftovers"):
+        findLeftovers()
