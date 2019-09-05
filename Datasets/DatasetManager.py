@@ -5,7 +5,7 @@ import os
 
 DATASET_FOLDER_NAME = "Datasets"
 STANDARD_GLOVE_FOLDER_NAME = "StandardGlove"
-GLOVE_VOCAB_CSV_NAME = "GloveVocab.csv"
+GLOVE_VOCAB_CSV_NAME = "VisualGloveVocab.csv"
 GLOVE_ABSOLUTE_PATH = "/media/fredrik/CE3B-25E9/unpacked/Images"
 
 VISUAL_EMBEDDINGS_FOLDER_NAME = "VisualEmbeddings"
@@ -46,8 +46,10 @@ def getGloveImagesPaths(word):
 
 
 def getGloveImages(word, asNumpy=True):
-    try: folder = getVisualGloveFolder(word) # Perhaps we don't have this word?
-    except: return []
+    try:
+        folder = getVisualGloveFolder(word)  # Perhaps we don't have this word?
+    except:
+        return []
 
     imgs = []
     for f in os.listdir(folder):
@@ -93,3 +95,30 @@ def getGloveFolderPath():
 
 def getGloveVocabCSVPath():
     return _addFileToPath(getGloveFolderPath(), GLOVE_VOCAB_CSV_NAME)
+
+
+############################ Embedding Manager
+def getWordsAndEmbeddingsFromFile(filePath, asStr=False):
+    counter = 0
+    collectedWords = {}
+    with open(filePath, 'r', encoding='utf-8') as file:
+        for line in file:
+            words = [w.strip() for w in line.split(' ') if len(w) > 0 and str.isspace(w) == False]  # Remove Whitespace
+            if(asStr == False):
+                collectedWords[words[0]] = np.array([float(w) for w in words[1:]])
+            else:
+                collectedWords[words[0]] = words[1:]
+            if(counter % 1000 == 0):
+                print(counter, words[0])
+            counter += 1
+
+    return collectedWords
+
+
+def _getWordsFromEmbeddingFile(filePath):
+    collectedWords = []
+    with open(filePath, 'r', encoding='utf-8') as file:
+        for line in file:
+            words = line.split(' ')
+            collectedWords.append(words[0])
+    return collectedWords

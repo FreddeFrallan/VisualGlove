@@ -102,5 +102,6 @@ venv.bak/
 
 # mypy
 .mypy_cache/
-Datasets/StandardGlove/*.txt
-Datasets/VisualEmbeddings/FullSize/*.txt
+Datasets/StandardGlove/
+Datasets/VisualEmbeddings/
+Datasets/CombinedGlove/

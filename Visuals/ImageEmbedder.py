@@ -2,6 +2,7 @@ from Datasets import DatasetManager
 from Visuals import EmbeddingModel
 import numpy as np
 
+
 def _imageWorker(id, vocab, wordsPerBatch, imgSize, sendPipe, listenPipe):
     print("Starting image worker:", id)
     from Datasets import DatasetManager
@@ -26,7 +27,7 @@ def createAverageEmbeddingsForVocab(vocab, wordsPerBatch, wordsPerFile, imgSize,
     import multiprocessing as mp
     vocabSize = len(vocab)
 
-    np.set_printoptions(suppress=True, linewidth=999999, threshold=9999999)
+    np.set_printoptions(suppress=True, linewidth=999999, threshold=9999999, )
     embeddingModel = EmbeddingModel.createImageEmbeddingModel()
 
     # Setup Image Procs
@@ -48,7 +49,7 @@ def createAverageEmbeddingsForVocab(vocab, wordsPerBatch, wordsPerFile, imgSize,
     filesCreated = 0
     totalEmbeddingsSaved = 0
     embeddingsInCurrentFile = 0
-    currentFile = open(DatasetManager._addFileToPath(outFolder,"Embeddings{}.txt".format(filesCreated)), 'w')
+    currentFile = open(DatasetManager._addFileToPath(outFolder, "LeftOverEmbeddings{}.txt".format(filesCreated)), 'w')
     while (totalEmbeddingsSaved < vocabSize):
         id, words, imgs = listenPipe.get()
 
@@ -64,7 +65,8 @@ def createAverageEmbeddingsForVocab(vocab, wordsPerBatch, wordsPerFile, imgSize,
                 currentFile.close()
                 embeddingsInCurrentFile = 0
                 filesCreated += 1
-                currentFile = open(DatasetManager._addFileToPath(outFolder,"Embeddings{}.txt".format(filesCreated)), 'w')
+                currentFile = open(
+                    DatasetManager._addFileToPath(outFolder, "LeftOverEmbeddings{}.txt".format(filesCreated)), 'w')
 
         except Exception as e:
             print(e)

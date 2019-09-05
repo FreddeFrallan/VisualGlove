@@ -2,7 +2,7 @@ from Datasets import DatasetManager
 import csv
 
 
-def createVocabCSVFile(fileName="GloveVocab.csv"):
+def createVocabCSVFile(fileName="VisualGloveVocab.csv"):
     from NormalGlove import Model
     model = Model.loadGlove50()
     vocab = list(model.wv.vocab)
@@ -12,7 +12,7 @@ def createVocabCSVFile(fileName="GloveVocab.csv"):
 
 
 def readVocabFromCSVFile():
-    with open(DatasetManager.getGloveVocabCSVPath(), 'r') as file:
+    with open(DatasetManager.getGloveVocabCSVPath(), 'r', encoding='utf-8') as file:
         reader = csv.reader(file)
         return list(reader)[0]
 
