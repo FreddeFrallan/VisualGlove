@@ -2,10 +2,12 @@ import numpy as np
 
 
 def createImageEmbeddingModel():
-    import keras
-    model = keras.applications.mobilenet_v2.MobileNetV2()
+    import keras, kito
+    model = keras.applications.MobileNetV2()
+    model.summary()
     outLayer = model.get_layer('global_average_pooling2d_1')
-    return keras.Model(model.inputs, outLayer.output)
+    #return keras.Model(model.inputs, outLayer.output)
+    return kito.reduce_keras_model(keras.Model(model.inputs, outLayer.output))
 
 
 def createAverageEmbeddingForImages(model, wordImages):
@@ -23,4 +25,3 @@ def createAverageEmbeddingForImages(model, wordImages):
         counter += n
 
     return [np.mean(np.array(wordVectors), axis=0) for wordVectors in vectorsPerWord]
-

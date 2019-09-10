@@ -15,7 +15,7 @@ def createGloveFile(embeddings, fileName):
     with open(fileName, 'w', encoding='utf-8') as newFile:
         for i, w in enumerate(embeddings.keys()):
             newFile.write("{} {}\n".format(w, _embeddingsToString(embeddings[w])))
-            if (i % 1000 == 0):
+            if (i % 100000 == 0):
                 print(i)
 
 
@@ -40,20 +40,18 @@ def createZeroVectors(vocab, vectorSize, fileName):
 
 
 def combineGloveFiles(file1, file2, outputFile):
-    embeddings = Model.loadGloveVectors(file1).wv
-    embeddings2 = Model.loadGloveVectors(file2).wv
+    embeddings = Model.loadKeyedVectors(file1)
+    embeddings2 = Model.loadKeyedVectors(file2)
     print("Vocab1:", len(embeddings.vocab), "  Vocab2:", len(embeddings2.vocab))
     vocab = list(embeddings.vocab)
     missingWords = []
-    #embeddings = DatasetManager.getWordsAndEmbeddingsFromFile(file1, asStr=True)
-    #embeddings2 = DatasetManager.getWordsAndEmbeddingsFromFile(file2, asStr=True)
     with open(outputFile, 'w', encoding='utf-8') as newFile:
         for i, w in enumerate(vocab):
             emb1 = _embeddingsToString(embeddings[w])
-            if(w in embeddings2):
+            if (w in embeddings2):
                 emb2 = _embeddingsToString(embeddings2[w])
                 newFile.write("{} {} {}\n".format(w, emb1, emb2))
-                if (i % 10000 == 0):
+                if (i % 100000 == 0):
                     print(i)
             else:
                 missingWords.append(w)

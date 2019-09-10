@@ -20,7 +20,6 @@ def findWordsThatLackEmbedings(fullVocab, folderPathToEmbeddingsFiles):
     return wordsNotFound
 
 
-
 if (__name__ == '__main__'):
     from NormalGlove import Model
 

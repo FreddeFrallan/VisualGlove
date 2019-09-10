@@ -1,22 +1,24 @@
-from sklearn.decomposition import PCA
-from Datasets import DatasetManager
 from NormalGlove import GloveFormatter
+from sklearn.decomposition import PCA
 from Utils import FileProcessing
-import pickle
+import pickle, os
 
 
 def _getPCATransformerFileName(dimensions):
     return 'VisualGlove-Full-PCA-Transformer-{}'.format(dimensions)
 
 
-def _getPCAEmbeddingsFileName(dimensions):
-    return 'PCAEmbeddings{}'.format(dimensions)
+def _getSubGloveOutputFolder(base, dim):
+    return base + "-{}".format(dim)
 
 
-def createPCAEmbeddingFiles(embeddings, PCAFolderPath, dimensions):
-    pureEmbeddings = [embeddings[k] for k in embeddings.keys()]
+def _getFullSubGloveOutputPath(base, name, dim):
+    return _getSubGloveOutputFolder(base, dim) + "/VisualGlove-{}-{}.txt".format(name, dim)
 
+
+def createPCAEmbeddingFiles(model, pureEmbeddings, PCAFolderPath, outputFolder, name, dimensions, skipDimensions=0):
     for d in dimensions:
+        realDim = d - skipDimensions
         print(_getPCATransformerFileName(d))
         with open(PCAFolderPath + "/" + _getPCATransformerFileName(d), 'rb') as file:
             pca = pickle.load(file)
@@ -25,11 +27,16 @@ def createPCAEmbeddingFiles(embeddings, PCAFolderPath, dimensions):
             pcaEmbeddings = pca.transform(pureEmbeddings)
 
             print("Creating data structure")
-            for i, k in enumerate(embeddings.keys()):
-                reducedEmbeddings[k] = pcaEmbeddings[i]
+            for i, w in enumerate(model.vocab):
+                reducedEmbeddings[w] = pcaEmbeddings[i][skipDimensions:]
 
-            print("Storing to disk")
-            GloveFormatter.createGloveFile(reducedEmbeddings, "VisualGlove-{}.txt".format(d))
+            fullOutFolder = _getSubGloveOutputFolder(outputFolder, realDim)
+            if (os.path.isdir(fullOutFolder) == False):
+                os.mkdir(fullOutFolder)
+            print("Storing to disk in:", fullOutFolder)
+
+            fullOutputPath = _getFullSubGloveOutputPath(outputFolder, name, realDim)
+            GloveFormatter.createGloveFile(reducedEmbeddings, fullOutputPath)
 
 
 def createPCATransformer(embeddings, newSize):
@@ -38,9 +45,8 @@ def createPCATransformer(embeddings, newSize):
     return pca
 
 
-def createPCATransformers(embeddings, dimensions=[50, 100, 150, 200, 300], outputFolder=""):
-    pureEmbeddings = [embeddings[k] for k in embeddings.keys()]
-    if (outputFolder != ""):
+def createPCATransformers(pureEmbeddings, dimensions, outputFolder=""):
+    if (outputFolder != "" and outputFolder[-1] != '/'):
         outputFolder += "/"
 
     for d in dimensions:
@@ -48,17 +54,3 @@ def createPCATransformers(embeddings, dimensions=[50, 100, 150, 200, 300], outpu
         pca = createPCATransformer(pureEmbeddings, d)
         print("Saving PCA")
         FileProcessing.saveToFile(pca, outputFolder + _getPCATransformerFileName(d))
-
-
-def main():
-    embeddingFilePath = DatasetManager.getVisualEmbeddingsFullSizeFolderPath() + "/VisualGlove-Full.txt"
-    embeddings = DatasetManager.getWordsAndEmbeddingsFromFile(embeddingFilePath)
-    outputFolder = DatasetManager.getVisualEmbeddingsFullSizeFolderPath() + "/PCA"
-    #createPCATransformers(embeddings, [25], outputFolder)
-
-    pcaFolderPath = DatasetManager.getVisualEmbeddingsFullSizeFolderPath() + "/PCA"
-    createPCAEmbeddingFiles(embeddings, pcaFolderPath, [25, 50, 100, 150, 200, 300])
-
-
-if (__name__ == '__main__'):
-    main()

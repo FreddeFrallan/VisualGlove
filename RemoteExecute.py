@@ -1,5 +1,8 @@
+from Scripts import Glove2KeyedVector, ConcatKeyedVectors, PerformPCA, CreateNewWordEmbeddings
 from Visuals import ImageEmbedder, Leftovers, VisualizeEmbeddings, PCAReduction
+from Analasis import BLESS, Synonyms, EvaluateOnAll
 from NormalGlove import GloveFormatter, Model
+from EmbeddingCreator import ImageDownloader
 from Datasets import DatasetManager
 import os
 
@@ -18,34 +21,39 @@ def concatEmbeddingFiles():
     GloveFormatter.concatenateEmbeddingsFiles(path, "VisualGlove-Full.txt")
 
 
-def getTopSimilarityFromCombinedKeyedVectors(filePath, outFile, words, n=20):
-    model = Model.loadGloveVectors(filePath)#Model.loadKeyedVectors(filePath)
-    with open(outFile, 'w') as file:
-        for w in words:
-            file.write("**** {}\n".format(w))
-            sim = model.most_similar(w, topn=n)
-            for s in sim:
-                file.write("{}\n".format(s[0]))
-            for s in sim:
-                file.write("{}\n".format(round(s[1], 3)))
-
-
-
 if __name__ == '__main__':
     # createAverageEmbeddingsForVocab(vocab, 3, 10, [224, 224], path, 3)
     # if(sys.argv[0].lower() == "leftovers"):
     # fixLeftovers()
     # concatEmbeddingFiles()
     # VisualizeEmbeddings.main()
-    # PCAReduction.main()
-
+    #PCAReduction.main()
+    #BLESS.main()
+    #Synonyms.main()
+    #Glove2KeyedVector.main()
+    #ConcatKeyedVectors.main()
+    #PerformPCA.main()
+    #CreateNewWordEmbeddings.main()
+    #CreateNewWordEmbeddings.main()
+    EvaluateOnAll.main()
+    #GloveFormatter.concatenateEmbeddingsFiles("/home/ubuntu/VisualGlove/Datasets/V2/Backup", "VisualGlove-2.0 Full.txt")
+    #Glove2KeyedVector.main()
+    #ImageEmbedder.createAverageEmbeddingsForVocab()
+    #ImageEmbedder.resizeAllImages()
+    #ImageDownloader.embedImages()
+    print("\nProgram Finished\n")
+    #basePath = "/home/ubuntu/VisualGlove/Datasets/StandardGlove/"
+    #for i in [50, 100, 200, 300]:
+    #    path = basePath + "glove.6B.{}d.txt".format(i)
+    #    keyedName = basePath + "Keyed-Glove{}-Visual0".format(i)
+    #    GloveFormatter.createKeyedVectorsFromGloveFile(path, keyedName)
+    '''
     sizes = [(300, 50), (300, 150), (300, 300), (300, 300), (100, 300), (50, 300)]
     for g, v in sizes:
         path = "/home/ubuntu/VisualGlove/Datasets/CombinedGlove/Glove{}-Visual{}/Keyed-Glove{}-Visual{}".format(g, v, g, v)
         m = Model.loadKeyedVectors(path)
         m.save_word2vec_format("Glove{}-Visual{}-W2V.txt".format(g, v))
 
-    '''
     words = ["trump", "cat", 'yellow', 'banana', 'art', 'arm', 'blue', 'sky', 'dance', 'face', 'stake', 'forest',
              'drama', 'obama']
     pathBase = "/home/ubuntu/VisualGlove/Datasets/CombinedGlove/"
@@ -78,7 +86,7 @@ if __name__ == '__main__':
     #sizes = [(50, 50), (50, 150)]
     #sizes = [(100, 100), (100, 200)]
     #sizes = [(300, 50), (300, 100), (300, 150), (300, 200), (300, 300)]
-    sizes = [(50, 300), (100, 300)]
+    sizes = [(200, 50), (200, 100), (200, 150), (200, 200), (200, 300)]
     for gloveSize, visualGloveSize in sizes:
         gloveFile = "/home/ubuntu/VisualGlove/Datasets/StandardGlove/glove.6B.{}d.txt".format(gloveSize)
         visualGloveFile = "/home/ubuntu/VisualGlove/Datasets/VisualEmbeddings/{}/VisualGlove-{}.txt".format(
